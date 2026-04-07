@@ -1,0 +1,37 @@
+.payment-page { padding: 28px 0 60px; }
+.payment-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+
+.method-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+.method-tab { background: var(--navy-3); border: 1px solid var(--border); color: var(--muted); padding: 9px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+.method-tab.active { border-color: var(--gold); color: var(--gold-light); background: var(--gold-dim); }
+
+.card-form, .upi-form { display: flex; flex-direction: column; gap: 16px; }
+.card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pay-btn { width: 100%; padding: 14px !important; margin-top: 20px; font-size: 16px !important; }
+.pay-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.secure-badge { text-align: center; font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+.netbanking-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 8px; }
+.bank-option { border: 1px solid var(--border); border-radius: 8px; padding: 14px 8px; cursor: pointer; text-align: center; transition: border-color 0.2s; }
+.bank-option:has(input:checked) { border-color: var(--gold); background: var(--gold-dim); }
+.bank-option input { display: none; }
+.bank-name { font-size: 14px; font-weight: 600; }
+
+.sum-flight { display: flex; flex-direction: column; gap: 6px; }
+.sf-route { font-size: 18px; font-weight: 700; color: var(--white); }
+.sf-meta { font-size: 13px; }
+
+.price-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); margin: 6px 0; }
+.price-row span:last-child { color: var(--white); font-weight: 500; }
+.price-row.total span { font-size: 18px; font-weight: 700; color: var(--white); }
+
+/* Success */
+.success-page { padding: 80px 0; max-width: 500px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.success-icon { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #34d399); display: flex; align-items: center; justify-content: center; font-size: 32px; color: #fff; font-weight: 700; }
+.success-page h1 { font-size: 36px; }
+.success-detail { width: 100%; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+.success-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); }
+.success-row strong { color: var(--white); }
+.success-actions { display: flex; gap: 12px; margin-top: 8px; }
+
+@media (max-width: 768px) { .payment-layout { grid-template-columns: 1fr; } }

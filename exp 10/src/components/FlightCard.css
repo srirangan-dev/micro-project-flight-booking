@@ -1,0 +1,204 @@
+.flight-card {
+  background: var(--navy-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.flight-card:hover {
+  border-color: #2a3f66;
+  transform: translateY(-2px);
+}
+
+.flight-main {
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.airline-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 130px;
+}
+
+.airline-logo {
+  width: 46px;
+  height: 46px;
+  background: var(--navy-3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold-light);
+  letter-spacing: 0.5px;
+}
+
+.airline-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--white);
+}
+
+.flight-num {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.flight-route {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.route-time {
+  text-align: center;
+}
+
+.time {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+
+.airport-code {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.route-middle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.route-duration {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.route-line {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background: var(--muted);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.stop-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.plane-icon {
+  font-size: 14px;
+  color: var(--gold);
+  transform: rotate(0deg);
+  flex-shrink: 0;
+}
+
+.route-stops { font-size: 12px; }
+
+.flight-amenities {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 120px;
+}
+
+.amenity {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--navy-3);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.seats-left {
+  font-size: 11px;
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+.flight-classes {
+  display: flex;
+  border-top: 1px solid var(--border);
+}
+
+.class-option {
+  flex: 1;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-right: 1px solid var(--border);
+  transition: background 0.2s;
+}
+
+.class-option:last-child { border-right: none; }
+.class-option:hover { background: var(--navy-3); }
+
+.class-label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.class-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold-light);
+  flex: 1;
+  text-align: center;
+}
+
+.select-btn {
+  padding: 8px 18px !important;
+  font-size: 13px !important;
+}
+
+@media (max-width: 768px) {
+  .flight-main { flex-direction: column; align-items: flex-start; }
+  .flight-classes { flex-direction: column; }
+  .class-option { border-right: none; border-bottom: 1px solid var(--border); }
+  .class-option:last-child { border-bottom: none; }
+}

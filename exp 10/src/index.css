@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+  --navy: #080d1a;
+  --navy-2: #0e1628;
+  --navy-3: #162038;
+  --navy-card: #111827;
+  --gold: #c9963a;
+  --gold-light: #e8ba5e;
+  --gold-dim: #c9963a33;
+  --white: #eef2ff;
+  --muted: #6b7a99;
+  --muted-2: #4a5568;
+  --accent: #3b82f6;
+  --success: #10b981;
+  --danger: #ef4444;
+  --border: #1e2d4a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--navy);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+}
+
+a { text-decoration: none; color: inherit; }
+
+input, select, button { font-family: 'DM Sans', sans-serif; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--navy-2); }
+::-webkit-scrollbar-thumb { background: var(--muted-2); border-radius: 3px; }
+
+.page-wrapper {
+  min-height: 100vh;
+  padding-top: 70px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #0a0d14;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px #c9963a55; }
+
+.btn-outline {
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 11px 28px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-outline:hover { background: var(--gold-dim); }
+
+.btn-ghost {
+  background: var(--navy-3);
+  color: var(--white);
+  border: 1px solid var(--border);
+  padding: 11px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-ghost:hover { border-color: var(--muted); }
+
+/* Cards */
+.card {
+  background: var(--navy-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+/* Form elements */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  background: var(--navy-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--white);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--gold);
+}
+
+.form-group input::placeholder { color: var(--muted); }
+
+select option { background: var(--navy-3); }
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+.badge-gold { background: var(--gold-dim); color: var(--gold-light); border: 1px solid #c9963a55; }
+.badge-green { background: #10b98120; color: #34d399; border: 1px solid #10b98140; }
+.badge-blue { background: #3b82f620; color: #60a5fa; border: 1px solid #3b82f640; }
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
+}
+
+/* Gold text */
+.gold { color: var(--gold-light); }
+.muted { color: var(--muted); }
+
+/* Fade in animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.4s ease forwards; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Error / success */
+.error-msg {
+  color: var(--danger);
+  font-size: 13px;
+  margin-top: 4px;
+}
+.success-msg {
+  color: var(--success);
+  font-size: 13px;
+  margin-top: 4px;
+}

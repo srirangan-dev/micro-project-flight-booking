@@ -1,0 +1,135 @@
+.search-page { min-height: 100vh; }
+
+.search-topbar {
+  background: var(--navy-2);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 0;
+  position: sticky;
+  top: 70px;
+  z-index: 50;
+}
+
+.search-bar-compact {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.form-group.compact { min-width: 120px; flex: 1; }
+.form-group.compact input,
+.form-group.compact select { height: 44px; }
+
+.arrow-sep {
+  color: var(--gold);
+  font-size: 18px;
+  align-self: flex-end;
+  padding-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.search-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 24px;
+  padding-top: 28px;
+  padding-bottom: 40px;
+  align-items: start;
+}
+
+/* Filters */
+.filters-panel {
+  position: sticky;
+  top: 150px;
+}
+
+.filters-panel h3 {
+  font-size: 18px;
+  color: var(--white);
+}
+
+.filter-group { display: flex; flex-direction: column; gap: 10px; }
+
+.filter-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--white);
+}
+
+.radio-item input[type="radio"] {
+  accent-color: var(--gold);
+  width: 15px;
+  height: 15px;
+}
+
+/* Results */
+.results-panel { display: flex; flex-direction: column; gap: 20px; }
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.results-title {
+  font-size: 26px;
+  color: var(--white);
+}
+
+.results-meta {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.flights-list { display: flex; flex-direction: column; gap: 16px; }
+
+/* Loading */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 80px 0;
+  color: var(--muted);
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-state h3 { font-size: 22px; }
+.empty-state p { margin-bottom: 8px; }
+
+@media (max-width: 900px) {
+  .search-layout { grid-template-columns: 1fr; }
+  .filters-panel { position: static; }
+}

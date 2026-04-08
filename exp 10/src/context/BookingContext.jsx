@@ -1,30 +1,67 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import { api } from "../api";
 
 const BookingContext = createContext(null);
 
+// ✅ Helper: reshape flat DB row → TicketCard format
+const reshapeBooking = (row) => ({
+  bookingId:   row.booking_id,
+  status:      row.status || "Confirmed",
+  bookedAt:    row.booked_at || new Date().toISOString(),
+  travelClass: row.travel_class,
+  seat:        row.seat_number,
+  totalAmount: Number(row.total_amount || row.paid_amount || 0),
+  flight: {
+    id:           row.flight_id,
+    flightNumber: row.flight_number,
+    airline:      row.airline,
+    airlineCode:  row.airline_code,
+    from:         row.from_code,
+    to:           row.to_code,
+    departure:    row.departure_time,
+    arrival:      row.arrival_time,
+    duration:     row.duration,
+    stops:        row.stops,
+    date:         row.flight_date,
+  },
+  passenger: {
+    firstName: row.first_name,
+    lastName:  row.last_name,
+    email:     row.pax_email,
+    phone:     row.pax_phone,
+    gender:    row.gender,
+  },
+});
+
 export function BookingProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("skybook_user");
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem("skybook_user");
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
   });
 
   const [searchParams, setSearchParams] = useState(null);
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [selectedClass, setSelectedClass] = useState("economy");
   const [passengerInfo, setPassengerInfo] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    dob: "",
-    gender: "",
-    passportNo: "",
+    firstName: "", lastName: "", email: "",
+    phone: "", dob: "", gender: "", passportNo: "",
   });
   const [selectedSeat, setSelectedSeat] = useState(null);
-  const [bookings, setBookings] = useState(() => {
-    const saved = localStorage.getItem("skybook_bookings");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [bookings, setBookings] = useState([]);
+
+  useEffect(() => {
+    if (user) {
+      api.getMyBookings()
+        .then(data => {
+          if (Array.isArray(data)) setBookings(data.map(reshapeBooking));
+        })
+        .catch(() => {});
+    } else {
+      setBookings([]);
+    }
+  }, [user]);
 
   const login = (userData) => {
     setUser(userData);
@@ -34,44 +71,79 @@ export function BookingProvider({ children }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("skybook_user");
+    localStorage.removeItem("skybook_token");
+    setBookings([]);
   };
 
-  const addBooking = (booking) => {
-    const newBooking = {
-      ...booking,
-      bookingId: `SKY${Date.now()}`,
-      bookedAt: new Date().toISOString(),
-      status: "Confirmed",
-    };
-    const updated = [newBooking, ...bookings];
-    setBookings(updated);
-    localStorage.setItem("skybook_bookings", JSON.stringify(updated));
-    return newBooking;
+  const addBooking = async (bookingData) => {
+    try {
+      // ✅ Payload: cleaned and simplified for the backend
+      const payload = {
+        // Try to get numeric ID if flight.id is string "FL001", otherwise send as is
+        flight_id:    bookingData.flight.id.replace(/\D/g, "") || bookingData.flight.id,
+        user_id:      user?.id,
+        travel_class: bookingData.travelClass,
+        seat_number:  bookingData.seat || null,
+        total_amount: bookingData.totalAmount,
+        // Flat fields (matching standard SQL naming)
+        first_name:   bookingData.passenger.firstName,
+        last_name:    bookingData.passenger.lastName,
+        pax_email:    bookingData.passenger.email,
+        pax_phone:    bookingData.passenger.phone,
+        gender:       bookingData.passenger.gender,
+      };
+
+      const bookingRes = await api.createBooking(payload);
+
+      if (!bookingRes?.booking_row_id) {
+        throw new Error("Server failed to return booking ID");
+      }
+
+      await api.processPayment({
+        booking_id:     bookingRes.booking_row_id,
+        amount:         bookingData.totalAmount,
+        payment_method: bookingData.paymentMethod || "card",
+      });
+
+      const updated = await api.getMyBookings();
+      if (Array.isArray(updated)) {
+        setBookings(updated.map(reshapeBooking));
+      }
+
+      return {
+        bookingId:   bookingRes.booking_id,
+        ...bookingData,
+        status:      "Confirmed",
+        bookedAt:    new Date().toISOString(),
+      };
+
+    } catch (err) {
+      console.error("Booking failed:", err.message);
+      throw err; 
+    }
   };
 
   const resetBookingFlow = () => {
     setSelectedFlight(null);
     setSelectedClass("economy");
     setPassengerInfo({
-      firstName: "", lastName: "", email: "", phone: "",
-      dob: "", gender: "", passportNo: "",
+      firstName: "", lastName: "", email: "",
+      phone: "", dob: "", gender: "", passportNo: "",
     });
     setSelectedSeat(null);
   };
 
   return (
-    <BookingContext.Provider
-      value={{
-        user, login, logout,
-        searchParams, setSearchParams,
-        selectedFlight, setSelectedFlight,
-        selectedClass, setSelectedClass,
-        passengerInfo, setPassengerInfo,
-        selectedSeat, setSelectedSeat,
-        bookings, addBooking,
-        resetBookingFlow,
-      }}
-    >
+    <BookingContext.Provider value={{
+      user, login, logout,
+      searchParams, setSearchParams,
+      selectedFlight, setSelectedFlight,
+      selectedClass,  setSelectedClass,
+      passengerInfo,  setPassengerInfo,
+      selectedSeat,   setSelectedSeat,
+      bookings, addBooking,
+      resetBookingFlow,
+    }}>
       {children}
     </BookingContext.Provider>
   );
@@ -79,6 +151,6 @@ export function BookingProvider({ children }) {
 
 export const useBooking = () => {
   const ctx = useContext(BookingContext);
-  if (!ctx) throw new Error("useBooking must be used inside BookingProvider");
+  if (!ctx) throw new Error("useBooking must be inside BookingProvider");
   return ctx;
 };

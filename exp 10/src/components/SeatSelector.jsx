@@ -32,15 +32,17 @@ export default function SeatSelector({ onSelect, selectedSeat }) {
       <div className="seat-plane">
         <div className="plane-nose">✈ Cockpit</div>
 
+        {/* ── col-labels section ────────────────────────────────────── */}
         <div className="col-labels">
           {cols.map((c, i) => (
-            <>
-              {i === 3 && <div key="aisle" className="aisle-label">Aisle</div>}
-              <div key={c} className="col-label">{c}</div>
-            </>
+            <div key={c} style={{ display: "contents" }}>   {/* ✅ keyed wrapper */}
+              {i === 3 && <div className="aisle-label">Aisle</div>}
+              <div className="col-label">{c}</div>
+            </div>
           ))}
         </div>
 
+        {/* ── seat rows section ──────────────────────────────────────── */}
         <div className="seats-grid">
           {rows.map((row) => (
             <div key={row} className="seat-row">
@@ -48,15 +50,14 @@ export default function SeatSelector({ onSelect, selectedSeat }) {
               {cols.map((col, ci) => {
                 const seat = seats.find((s) => s.row === row && s.col === col);
                 return (
-                  <>
-                    {ci === 3 && <div key={`aisle-${row}`} className="seat-aisle" />}
+                  <div key={`${row}${col}`} style={{ display: "contents" }}>  {/* ✅ keyed */}
+                    {ci === 3 && <div className="seat-aisle" />}
                     <div
-                      key={seat.id}
                       className={getSeatClass(seat)}
                       onClick={() => handleClick(seat)}
                       title={`${seat.id}${seat.extraLegroom ? " - Extra Legroom" : ""}${seat.price > 0 ? ` (+₹${seat.price})` : ""}`}
                     />
-                  </>
+                  </div>
                 );
               })}
               <div className="row-num">{row}</div>

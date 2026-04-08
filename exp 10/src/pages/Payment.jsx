@@ -10,12 +10,13 @@ export default function Payment() {
     selectedSeat, addBooking, resetBookingFlow, user,
   } = useBooking();
 
-  const [method, setMethod] = useState("card");
-  const [card, setCard] = useState({ number: "", name: "", expiry: "", cvv: "" });
-  const [upiId, setUpiId] = useState("");
+  const [method,     setMethod]     = useState("card");
+  const [card,       setCard]       = useState({ number: "", name: "", expiry: "", cvv: "" });
+  const [upiId,      setUpiId]      = useState("");
   const [processing, setProcessing] = useState(false);
-  const [done, setDone] = useState(false);
+  const [done,       setDone]       = useState(false);
   const [newBooking, setNewBooking] = useState(null);
+  const [error,      setError]      = useState("");
 
   useEffect(() => {
     if (!selectedFlight || !user) navigate("/");
@@ -23,10 +24,10 @@ export default function Payment() {
 
   if (!selectedFlight) return null;
 
-  const base = selectedFlight.prices[selectedClass];
+  const base    = selectedFlight.prices[selectedClass];
   const seatFee = selectedSeat?.price || 0;
-  const tax = Math.floor(base * 0.12);
-  const total = base + seatFee + tax;
+  const tax     = Math.floor(base * 0.12);
+  const total   = base + seatFee + tax;
 
   const setC = (k, v) => setCard((c) => ({ ...c, [k]: v }));
 
@@ -38,24 +39,35 @@ export default function Payment() {
     return n.length >= 3 ? `${n.slice(0, 2)}/${n.slice(2)}` : n;
   };
 
-  const handlePay = (e) => {
+  // ✅ handlePay is now async — properly awaits addBooking
+  const handlePay = async (e) => {
     e.preventDefault();
     setProcessing(true);
-    setTimeout(() => {
-      const booking = addBooking({
-        flight: selectedFlight,
-        passenger: passengerInfo,
-        seat: selectedSeat?.id,
-        travelClass: selectedClass,
-        totalAmount: total,
+    setError("");
+
+    try {
+      // ✅ Pass paymentMethod so backend saves it correctly
+      const booking = await addBooking({
+        flight:        selectedFlight,
+        passenger:     passengerInfo,
+        seat:          selectedSeat?.id,
+        travelClass:   selectedClass,
+        totalAmount:   total,
+        paymentMethod: method,   // ← card / upi / netbanking
       });
+
       setNewBooking(booking);
       setDone(true);
-      setProcessing(false);
       resetBookingFlow();
-    }, 2000);
+    } catch (err) {
+      setError("Payment failed. Please try again.");
+      console.error(err);
+    } finally {
+      setProcessing(false);
+    }
   };
 
+  // ✅ Success screen
   if (done && newBooking) {
     return (
       <div className="page-wrapper">
@@ -79,8 +91,20 @@ export default function Payment() {
             </div>
             <div className="success-row">
               <span>Passenger</span>
-              <strong>{passengerInfo.firstName || newBooking.passenger?.firstName} {passengerInfo.lastName || newBooking.passenger?.lastName}</strong>
+              <strong>
+                {newBooking.passenger?.firstName} {newBooking.passenger?.lastName}
+              </strong>
             </div>
+            <div className="success-row">
+              <span>Class</span>
+              <strong style={{ textTransform: "capitalize" }}>{newBooking.travelClass}</strong>
+            </div>
+            {newBooking.seat && (
+              <div className="success-row">
+                <span>Seat</span>
+                <strong>{newBooking.seat}</strong>
+              </div>
+            )}
             <div className="success-row">
               <span>Amount Paid</span>
               <strong className="gold">₹{total.toLocaleString("en-IN")}</strong>
@@ -88,8 +112,8 @@ export default function Payment() {
           </div>
 
           <div className="success-actions">
-            <button className="btn-primary" onClick={() => navigate("/history")}>View Ticket</button>
-            <button className="btn-outline" onClick={() => navigate("/")}>Book Another</button>
+            <button className="btn-primary"  onClick={() => navigate("/history")}>View Ticket</button>
+            <button className="btn-outline"  onClick={() => navigate("/")}>Book Another</button>
           </div>
         </div>
       </div>
@@ -105,12 +129,12 @@ export default function Payment() {
         </div>
 
         <div className="payment-layout">
+          {/* ── Payment form ── */}
           <div className="payment-form card">
-            {/* Method tabs */}
             <div className="method-tabs">
               {[
-                { v: "card", l: "💳 Card" },
-                { v: "upi", l: "📱 UPI" },
+                { v: "card",       l: "💳 Card" },
+                { v: "upi",        l: "📱 UPI" },
                 { v: "netbanking", l: "🏦 Net Banking" },
               ].map(({ v, l }) => (
                 <button
@@ -125,6 +149,7 @@ export default function Payment() {
             </div>
 
             <form onSubmit={handlePay}>
+              {/* Card */}
               {method === "card" && (
                 <div className="card-form">
                   <div className="form-group">
@@ -169,6 +194,7 @@ export default function Payment() {
                 </div>
               )}
 
+              {/* UPI */}
               {method === "upi" && (
                 <div className="form-group">
                   <label>UPI ID</label>
@@ -181,6 +207,7 @@ export default function Payment() {
                 </div>
               )}
 
+              {/* Net Banking */}
               {method === "netbanking" && (
                 <div className="netbanking-grid">
                   {["SBI", "HDFC", "ICICI", "Axis", "Kotak", "PNB"].map((b) => (
@@ -190,6 +217,13 @@ export default function Payment() {
                     </label>
                   ))}
                 </div>
+              )}
+
+              {/* ✅ Error message */}
+              {error && (
+                <p style={{ color: "var(--danger, #e74c3c)", marginTop: 8, fontSize: 14 }}>
+                  ⚠ {error}
+                </p>
               )}
 
               <button
@@ -204,21 +238,43 @@ export default function Payment() {
             <div className="secure-badge">🔒 256-bit SSL Secured · PCI DSS Compliant</div>
           </div>
 
-          {/* Order summary */}
+          {/* ── Order summary ── */}
           <div className="payment-summary card">
             <h3>Order Summary</h3>
             <div className="divider" />
+
             <div className="sum-flight">
               <div className="sf-route">{selectedFlight.from} → {selectedFlight.to}</div>
               <div className="sf-meta muted">{selectedFlight.airline} · {selectedFlight.flightNumber}</div>
-              <div className="sf-meta muted">{selectedFlight.date} · {selectedFlight.departure} – {selectedFlight.arrival}</div>
-              <div className="sf-meta muted">Passenger: {passengerInfo.firstName} {passengerInfo.lastName}</div>
-              {selectedSeat && <div className="sf-meta muted">Seat: {selectedSeat.id}</div>}
+              <div className="sf-meta muted">
+                {selectedFlight.date} · {selectedFlight.departure} – {selectedFlight.arrival}
+              </div>
+              <div className="sf-meta muted">
+                Passenger: {passengerInfo.firstName} {passengerInfo.lastName}
+              </div>
+              <div className="sf-meta muted" style={{ textTransform: "capitalize" }}>
+                Class: {selectedClass}
+              </div>
+              {selectedSeat && (
+                <div className="sf-meta muted">Seat: {selectedSeat.id}</div>
+              )}
             </div>
+
             <div className="divider" />
-            <div className="price-row"><span>Base Fare</span><span>₹{base.toLocaleString("en-IN")}</span></div>
-            {seatFee > 0 && <div className="price-row"><span>Seat Fee</span><span>₹{seatFee}</span></div>}
-            <div className="price-row"><span>Tax (12%)</span><span>₹{tax.toLocaleString("en-IN")}</span></div>
+            <div className="price-row">
+              <span>Base Fare</span>
+              <span>₹{base.toLocaleString("en-IN")}</span>
+            </div>
+            {seatFee > 0 && (
+              <div className="price-row">
+                <span>Seat Fee</span>
+                <span>₹{seatFee}</span>
+              </div>
+            )}
+            <div className="price-row">
+              <span>Tax (12%)</span>
+              <span>₹{tax.toLocaleString("en-IN")}</span>
+            </div>
             <div className="divider" />
             <div className="price-row total">
               <span>Total</span>
